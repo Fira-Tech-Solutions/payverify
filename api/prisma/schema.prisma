@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  GRACE
+  EXPIRED
+}
+
+enum SubscriptionTier {
+  STARTER
+  BUSINESS
+  ENTERPRISE
+}
+
+enum UserRole {
+  OWNER
+  MANAGER
+  CASHIER
+}
+
+enum TxStatus {
+  PENDING
+  VERIFIED
+  MISMATCH
+  EXPIRED
+}
+
+enum PaymentMethod {
+  TELEBIRR
+  CBE
+  AWASH
+  DASHEN
+  ABYSSINIA
+  AMOLE
+  HELLOCASH
+}
+
+model Business {
+  id                 String             @id @default(uuid())
+  ownerName          String
+  businessName       String
+  phoneNumber        String             @default("")
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  subscriptionTier   SubscriptionTier   @default(STARTER)
+  trialEndsAt        DateTime
+  subscriptionEndsAt DateTime?
+  graceEndsAt        DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  users                 User[]
+  transactions          Transaction[]
+  inviteCodes           InviteCode[]
+  subscriptionPayments  SubscriptionPayment[]
+  subscriptionOrders    SubscriptionOrder[]
+}
+
+model User {
+  id           String   @id @default(uuid())
+  businessId   String
+  name         String
+  phone        String   @unique
+  passwordHash String
+  role         UserRole @default(CASHIER)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  business     Business      @relation(fields: [businessId], references: [id])
+  transactions Transaction[]
+}
+
+model Transaction {
+  id            String        @id @default(uuid())
+  businessId    String
+  workerId      String?
+  transactionId String        @unique
+  amount        Decimal       @db.Decimal(10, 2)
+  senderName    String        @default("")
+  senderPhone   String        @default("")
+  paymentMethod PaymentMethod
+  status        TxStatus      @default(PENDING)
+  rawSms        String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id])
+  worker   User?    @relation(fields: [workerId], references: [id])
+
+  @@index([businessId, status])
+  @@index([businessId, createdAt])
+}
+
+model InviteCode {
+  id         String    @id @default(uuid())
+  businessId String
+  code       String    @unique
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  business Business @relation(fields: [businessId], references: [id])
+
+  @@index([code])
+}
+
+model SubscriptionPayment {
+  id            String           @id @default(uuid())
+  businessId    String
+  transactionId String           @unique
+  amount        Decimal          @db.Decimal(10, 2)
+  tier          SubscriptionTier
+  periodMonths  Int
+  paidAt        DateTime
+  verifiedAt    DateTime?
+  createdAt     DateTime         @default(now())
+
+  business Business @relation(fields: [businessId], references: [id])
+
+  @@index([businessId, createdAt])
+}
+
+model SubscriptionPlan {
+  id           String           @id @default(uuid())
+  tier         SubscriptionTier @unique
+  nameEn       String
+  monthlyPrice Decimal          @db.Decimal(10, 2)
+  yearlyPrice  Decimal          @db.Decimal(10, 2)
+  maxCashiers  Int              @default(-1)
+  maxLocations Int              @default(1)
+  features     Json
+  isActive     Boolean          @default(true)
+}
+
+model SubscriptionOrder {
+  id           String   @id @default(uuid())
+  businessId   String
+  outTradeNo   String   @unique
+  tradeNo      String?
+  tier         String
+  periodMonths Int
+  amount       Decimal  @db.Decimal(10, 2)
+  status       String   @default("PENDING")
+  toPayUrl     String?
+  paidAt       DateTime?
+  notifyPayload String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id])
+
+  @@index([businessId])
+  @@index([outTradeNo])
+}

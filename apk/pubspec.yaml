@@ -1,0 +1,87 @@
+name: payVerify
+description: Payment verification app for Ethiopian local merchants
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # QR scanning
+  mobile_scanner: ^5.1.0
+
+  # OCR for receipt scanning
+  google_mlkit_text_recognition: ^0.13.0
+
+  # HTTP client
+  dio: ^5.4.0
+
+  # WebSocket for real-time verification
+  web_socket_channel: ^2.4.0
+
+  # Local database (offline support)
+  hive_flutter: ^1.1.0
+
+  # Secure storage for tokens
+  flutter_secure_storage: ^9.0.0
+
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # Navigation
+  go_router: ^13.2.0
+
+  # UI utilities
+  intl: ^0.19.0
+  shimmer: ^3.0.0
+  lottie: ^3.1.0
+  fluttertoast: ^9.1.0
+  permission_handler: ^11.3.0
+  google_fonts: ^6.1.0
+
+  # Image picker for receipt photos
+  image_picker: ^1.1.2
+
+  # TeleBirr H5 WebView
+  webview_flutter: ^4.10.0
+
+  # Launch URLs / deep links (TeleBirr SuperApp)
+  url_launcher: ^6.2.0
+
+  # Celebration animation
+  confetti: ^0.7.0
+
+  # App lock (PIN + Biometric)
+  local_auth: ^2.3.0
+  crypto: ^3.0.3
+
+  cupertino_icons: ^1.0.6
+  flutter_native_splash: ^2.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.8
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/bank_icons/
+    - assets/payverify_icons/
+
+flutter_native_splash:
+  color: "#080C0A"
+  image: assets/splash_logo.png
+  color_dark: "#080C0A"
+  image_dark: assets/splash_logo.png
+  android_12:
+    color: "#080C0A"
+    image: assets/splash_logo.png
+    icon_background_color: "#080C0A"
+  web: false
