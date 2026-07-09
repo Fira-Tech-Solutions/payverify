@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'features/app_shell.dart';
 import 'features/auth/screens/login_screen.dart';
+import 'features/auth/screens/register_screen.dart';
+import 'features/auth/screens/complete_signup_screen.dart';
 import 'features/auth/screens/pin_setup_screen.dart';
 import 'features/auth/screens/pin_lock_screen.dart';
 import 'features/splash/screens/splash_screen.dart';
@@ -51,6 +53,8 @@ final _router = GoRouter(
     GoRoute(path: '/', builder: (_, __) => const SplashScreen()),
     GoRoute(path: '/auth', builder: (_, __) => const _RootRedirect()),
     GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+    GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
+    GoRoute(path: '/register/complete', builder: (_, __) => const CompleteSignupScreen()),
     GoRoute(path: '/pin-setup', builder: (_, __) => const PinSetupScreen()),
     GoRoute(
       path: '/pin-lock',

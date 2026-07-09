@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../providers/providers.dart';
+import '../../../services/api/api_client.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/app_messages.dart';
 
@@ -125,8 +126,18 @@ class WorkersScreen extends ConsumerWidget {
         ],
       ),
     );
-    if (confirm == true) {
-      await ref.read(workersProvider.future).then((_) {});
+    if (confirm == true && context.mounted) {
+      try {
+        await api.removeWorker(workerId);
+        ref.invalidate(workersProvider);
+        if (context.mounted) {
+          AppMessages.success(context, 'Worker removed');
+        }
+      } catch (e) {
+        if (context.mounted) {
+          AppMessages.error(context, 'Failed to remove worker: $e');
+        }
+      }
     }
   }
 }

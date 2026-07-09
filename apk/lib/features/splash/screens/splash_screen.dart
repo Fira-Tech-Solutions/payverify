@@ -222,8 +222,9 @@ class _SplashScreenState extends State<SplashScreen>
                 child: SizedBox(
                   width: 140,
                   height: 140,
-                  child: CustomPaint(
-                    painter: SealPainter(animationValue: _sealController.value),
+                  child: Image.asset(
+                    'assets/payverify_icons/payverify_icon_512x512.png',
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
@@ -484,8 +485,9 @@ class _SplashScreenState extends State<SplashScreen>
                 child: SizedBox(
                   width: 120,
                   height: 120,
-                  child: CustomPaint(
-                    painter: SealPainter(animationValue: _sealController.value),
+                  child: Image.asset(
+                    'assets/payverify_icons/payverify_icon_512x512.png',
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),

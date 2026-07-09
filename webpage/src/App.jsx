@@ -1,27 +1,24 @@
+import { useTheme } from './hooks/useTheme'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
-import TrustBar from './components/TrustBar'
-import Problem from './components/Problem'
-import HowItWorks from './components/HowItWorks'
-import Analytics from './components/Analytics'
-import Pricing from './components/Pricing'
-import Download from './components/Download'
-import Faq from './components/Faq'
+import StatsBanner from './components/StatsBanner'
+import Features from './components/Features'
+import AppGallery from './components/AppGallery'
+import DownloadSection from './components/DownloadSection'
 import Footer from './components/Footer'
 
 export default function App() {
+  const { theme, toggleTheme } = useTheme()
+
   return (
-    <div className="font-sans text-ink">
-      <Navbar />
+    <div className="min-h-screen bg-noise" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+      <Navbar theme={theme} toggleTheme={toggleTheme} />
       <main>
         <Hero />
-        <TrustBar />
-        <Problem />
-        <HowItWorks />
-        <Analytics />
-        <Pricing />
-        <Download />
-        <Faq />
+        <StatsBanner />
+        <Features />
+        <AppGallery />
+        <DownloadSection />
       </main>
       <Footer />
     </div>

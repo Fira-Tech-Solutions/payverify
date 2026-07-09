@@ -218,6 +218,52 @@ class ApiClient {
     }
   }
 
+  // ─── Fayda Registration (2-step) ───────────────────────────────
+
+  /// Step 1: Register with business name + Fayda ID
+  /// Returns userId and fetched identity data from the Fayda registry.
+  Future<Map<String, String>> registerInitial({
+    required String businessName,
+    required String faydaId,
+  }) async {
+    try {
+      final res = await _dio.post('/auth/register-initial', data: {
+        'businessName': businessName,
+        'faydaId': faydaId,
+      });
+      return {
+        'userId': res.data['userId'] as String,
+        'fetchedName': res.data['fetchedName'] as String,
+        'fetchedPhone': res.data['fetchedPhone'] as String,
+      };
+    } on DioException catch (e) {
+      _handleError(e);
+    }
+  }
+
+  /// Step 2: Complete signup with password
+  /// Returns the final AppUser with JWT token.
+  Future<AppUser> completeSignup({
+    required String userId,
+    required String password,
+  }) async {
+    try {
+      final res = await _dio.post('/auth/complete-signup', data: {
+        'userId': userId,
+        'password': password,
+      });
+      final user = AppUser.fromJson({
+        ...res.data['user'],
+        'token': res.data['token'],
+      });
+      await localDb.saveToken(res.data['token']);
+      await localDb.saveUser(user);
+      return user;
+    } on DioException catch (e) {
+      _handleError(e);
+    }
+  }
+
   // ─── Verify ──────────────────────────────────────────────────────
 
   /// Core verification: send tx reference → get VERIFIED / MISMATCH / PENDING

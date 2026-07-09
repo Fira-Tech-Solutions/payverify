@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../providers/providers.dart';
 import '../../../theme/app_theme.dart';
@@ -26,23 +27,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _joinObscure = true;
   bool _joinConfirmObscure = true;
 
-  // Register fields
-  bool _showRegister = false;
-  final _regNameCtrl     = TextEditingController();
-  final _regBizCtrl      = TextEditingController();
-  final _regPhoneCtrl    = TextEditingController();
-  final _regPwCtrl       = TextEditingController();
-  final _regConfirmPwCtrl = TextEditingController();
-  bool _regObscure = true;
-  bool _regConfirmObscure = true;
-
   @override
   void dispose() {
     for (final c in [
       _phoneCtrl, _passwordCtrl, _codeCtrl, _nameCtrl,
       _joinPhoneCtrl, _joinPwCtrl, _joinConfirmPwCtrl,
-      _regNameCtrl, _regBizCtrl, _regPhoneCtrl,
-      _regPwCtrl, _regConfirmPwCtrl,
     ]) c.dispose();
     super.dispose();
   }
@@ -112,7 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 16),
                       ],
 
-                      if (!_showJoin && !_showRegister) ...[
+                      if (!_showJoin) ...[
                         const Text('Sign in',
                             style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.w700)),
@@ -163,7 +152,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 title: 'Register\nBusiness',
                                 subtitle: 'Start verifying payments',
                                 onTap: () =>
-                                    setState(() => _showRegister = true),
+                                    context.push('/register'),
                               ),
                             ),
                           ],
@@ -248,54 +237,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               : const Text('Join business'),
                         ),
                       ],
-
-                      if (_showRegister) ...[
-                        _BackRow('Register your business',
-                            () => setState(() => _showRegister = false)),
-                        const SizedBox(height: 20),
-                        _label('Your full name'),
-                        _field(_regNameCtrl, hint: 'Dawit Kebede'),
-                        const SizedBox(height: 12),
-                        _label('Business name'),
-                        _field(_regBizCtrl, hint: 'Dawit General Store'),
-                        const SizedBox(height: 12),
-                        _label('Phone number'),
-                        _field(_regPhoneCtrl, hint: '09xxxxxxxx',
-                            keyboardType: TextInputType.phone),
-                        const SizedBox(height: 12),
-                        _label('Password'),
-                        _field(_regPwCtrl,
-                            hint: '••••••••',
-                            obscure: _regObscure,
-                            suffix: IconButton(
-                              icon: Icon(_regObscure
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                                  size: 20, color: AppTheme.textMuted),
-                              onPressed: () =>
-                                  setState(() => _regObscure = !_regObscure),
-                            )),
-                        const SizedBox(height: 12),
-                        _label('Confirm password'),
-                        _field(_regConfirmPwCtrl,
-                            hint: '••••••••',
-                            obscure: _regConfirmObscure,
-                            suffix: IconButton(
-                              icon: Icon(_regConfirmObscure
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                                  size: 20, color: AppTheme.textMuted),
-                              onPressed: () =>
-                                  setState(() => _regConfirmObscure = !_regConfirmObscure),
-                            )),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: isLoading ? null : _register,
-                          child: isLoading
-                              ? _loader()
-                              : const Text('Create account'),
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -326,21 +267,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           name:     _nameCtrl.text.trim(),
           phone:    _joinPhoneCtrl.text.trim(),
           password: _joinPwCtrl.text,
-        );
-  }
-
-  void _register() {
-    if (_regPwCtrl.text != _regConfirmPwCtrl.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
-      return;
-    }
-    ref.read(authProvider.notifier).register(
-          name:         _regNameCtrl.text.trim(),
-          phone:        _regPhoneCtrl.text.trim(),
-          password:     _regPwCtrl.text,
-          businessName: _regBizCtrl.text.trim(),
         );
   }
 

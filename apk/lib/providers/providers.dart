@@ -60,6 +60,11 @@ class AuthNotifier extends StateNotifier<AsyncValue<AppUser?>> {
     await localDb.logout();
     state = const AsyncValue.data(null);
   }
+
+  /// Reload user from local storage (after completing registration)
+  void reloadFromStorage() {
+    _loadCached();
+  }
 }
 
 // ─── Transactions ────────────────────────────────────────────────────────────
@@ -162,3 +167,125 @@ final workersProvider =
 final inviteCodeProvider = FutureProvider<String>(
   (ref) => api.generateInviteCode(),
 );
+
+// ─── Fayda Registration (2-step) ─────────────────────────────────────────────
+
+class RegistrationState {
+  final String? userId;
+  final String? fetchedName;
+  final String? fetchedPhone;
+  final String? businessName;
+  final String? faydaId;
+  final bool isSubmitting;
+  final String? error;
+
+  const RegistrationState({
+    this.userId,
+    this.fetchedName,
+    this.fetchedPhone,
+    this.businessName,
+    this.faydaId,
+    this.isSubmitting = false,
+    this.error,
+  });
+
+  RegistrationState copyWith({
+    String? userId,
+    String? fetchedName,
+    String? fetchedPhone,
+    String? businessName,
+    String? faydaId,
+    bool? isSubmitting,
+    String? error,
+  }) {
+    return RegistrationState(
+      userId: userId ?? this.userId,
+      fetchedName: fetchedName ?? this.fetchedName,
+      fetchedPhone: fetchedPhone ?? this.fetchedPhone,
+      businessName: businessName ?? this.businessName,
+      faydaId: faydaId ?? this.faydaId,
+      isSubmitting: isSubmitting ?? this.isSubmitting,
+      error: error,
+    );
+  }
+}
+
+final registrationProvider =
+    StateNotifierProvider<RegistrationNotifier, RegistrationState>(
+  (ref) => RegistrationNotifier(ref),
+);
+
+class RegistrationNotifier extends StateNotifier<RegistrationState> {
+  final Ref _ref;
+  RegistrationNotifier(this._ref) : super(const RegistrationState());
+
+  /// Store data returned from the Fayda WebView handshake (backend already
+  /// created Business + User records during the OIDC callback).
+  void setFaydaData({
+    required String userId,
+    required String fetchedName,
+    required String fetchedPhone,
+    required String businessName,
+  }) {
+    state = state.copyWith(
+      userId: userId,
+      fetchedName: fetchedName,
+      fetchedPhone: fetchedPhone,
+      businessName: businessName,
+      isSubmitting: false,
+      error: null,
+    );
+  }
+
+  /// Step 1: Call /auth/register-initial with business name + Fayda ID
+  Future<bool> registerInitial({
+    required String businessName,
+    required String faydaId,
+  }) async {
+    state = state.copyWith(isSubmitting: true, error: null);
+    try {
+      final result = await api.registerInitial(
+        businessName: businessName,
+        faydaId: faydaId,
+      );
+      state = state.copyWith(
+        userId: result['userId'],
+        fetchedName: result['fetchedName'],
+        fetchedPhone: result['fetchedPhone'],
+        businessName: businessName,
+        faydaId: faydaId,
+        isSubmitting: false,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isSubmitting: false,
+        error: e is ApiException ? e.message : 'Registration failed. Please try again.',
+      );
+      return false;
+    }
+  }
+
+  /// Step 2: Call /auth/complete-signup with password
+  Future<bool> completeSignup(String password) async {
+    if (state.userId == null) return false;
+    state = state.copyWith(isSubmitting: true, error: null);
+    try {
+      await api.completeSignup(userId: state.userId!, password: password);
+      // Update auth provider so the app navigates to PIN setup
+      _ref.read(authProvider.notifier).reloadFromStorage();
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isSubmitting: false,
+        error: e is ApiException ? e.message : 'Signup failed. Please try again.',
+      );
+      return false;
+    }
+  }
+
+  /// Reset state (e.g., on navigation away)
+  void reset() {
+    state = const RegistrationState();
+  }
+}

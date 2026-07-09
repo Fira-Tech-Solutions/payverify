@@ -45,7 +45,7 @@ enum PaymentMethod {
 
 model Business {
   id                 String             @id @default(uuid())
-  ownerName          String
+  ownerName          String             @default("")
   businessName       String
   phoneNumber        String             @default("")
   subscriptionStatus SubscriptionStatus @default(TRIAL)
@@ -66,9 +66,10 @@ model Business {
 model User {
   id           String   @id @default(uuid())
   businessId   String
-  name         String
-  phone        String   @unique
-  passwordHash String
+  name         String   @default("")
+  phone        String   @unique @default("")
+  passwordHash String   @default("")
+  faydaId      String?  @unique
   role         UserRole @default(CASHIER)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())

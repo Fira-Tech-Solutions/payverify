@@ -1,112 +1,247 @@
-import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 
-export default function Hero() {
-  const [cycle, setCycle] = useState(0)
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.12, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
+  }),
+}
 
-  useEffect(() => {
-    const id = setInterval(() => setCycle((c) => c + 1), 4200)
-    return () => clearInterval(id)
-  }, [])
-
+function PhoneMockup() {
   return (
-    <section id="top" className="relative overflow-hidden bg-paperlight pt-32 pb-20 md:pt-40 md:pb-28">
-      <div className="pointer-events-none absolute -top-40 -right-40 w-[560px] h-[560px] bg-stamp-ring" />
+    <div className="relative mx-auto w-[260px] sm:w-[280px] lg:w-[320px]" style={{ perspective: '1000px' }}>
+      {/* Glow behind phone */}
+      <div className="absolute -inset-8 rounded-[3rem] opacity-40 blur-3xl" style={{ background: 'radial-gradient(circle, var(--color-forest) 0%, transparent 70%)' }} />
 
-      <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
-        <div className="animate-rise">
-          <p className="font-mono text-xs tracking-widest uppercase text-birr-dark mb-5">
-            Built for Ethiopian tills
-          </p>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.05] font-semibold text-ink">
-            Know a payment is real
-            <span className="block text-birr">before the customer walks out.</span>
-          </h1>
-          <p className="mt-6 font-sans text-lg text-ink/70 max-w-lg">
-            BirrGuard checks TeleBirr, CBE, Awash, Dashen and five other Ethiopian payment
-            methods against the source in seconds — by QR, by receipt photo, or by transaction
-            ID. Fake screenshots stop working the day you install it.
-          </p>
+      <motion.div
+        initial={{ rotateY: -15, rotateX: 5, opacity: 0 }}
+        animate={{ rotateY: -5, rotateX: 2, opacity: 1 }}
+        transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.4 }}
+        className="relative"
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        {/* Phone frame */}
+        <div className="relative rounded-[2.5rem] p-2 shadow-2xl" style={{ backgroundColor: 'var(--color-border)' }}>
+          <div className="relative overflow-hidden rounded-[2rem] bg-[var(--color-surface)]" style={{ border: '1px solid var(--color-border)' }}>
+            {/* Notch */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10 h-7 w-32 rounded-b-2xl" style={{ backgroundColor: 'var(--color-border)' }} />
 
-          <div className="mt-9 flex flex-wrap items-center gap-4">
-            <a
-              href="#download"
-              className="font-sans font-semibold bg-ink text-paperlight px-6 py-3.5 rounded-full hover:bg-birr transition-colors focus-ring"
-            >
-              Download the APK
-            </a>
-            <a
-              href="#how"
-              className="font-sans font-semibold text-ink/80 px-6 py-3.5 rounded-full border border-ink/15 hover:border-birr hover:text-birr transition-colors focus-ring"
-            >
-              See how it verifies
-            </a>
-          </div>
-
-          <div className="mt-10 flex items-center gap-6 font-mono text-xs text-ink/50">
-            <span>Android 8.0+</span>
-            <span className="w-1 h-1 rounded-full bg-ink/30" />
-            <span>Works offline for scanning</span>
-            <span className="w-1 h-1 rounded-full bg-ink/30" />
-            <span>Amharic &amp; English</span>
-          </div>
-        </div>
-
-        <div className="relative flex justify-center">
-          {/* Phone frame */}
-          <div className="relative w-[280px] sm:w-[300px] rounded-[2.4rem] border-[6px] border-ink bg-ink shadow-2xl">
-            <div className="rounded-[2rem] overflow-hidden bg-paperlight aspect-[9/18.5] relative">
-              {/* app header */}
-              <div className="bg-birr text-paperlight px-5 pt-6 pb-4">
-                <p className="font-mono text-[10px] uppercase tracking-widest opacity-80">Verify payment</p>
-                <p className="font-display text-lg font-semibold mt-1">Receipt scan</p>
+            {/* Screen content */}
+            <div className="relative min-h-[480px] sm:min-h-[540px] overflow-hidden" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+              {/* Status bar */}
+              <div className="flex items-center justify-between px-6 pt-8 pb-3">
+                <span className="text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>9:41</span>
+                <div className="flex gap-1">
+                  <div className="h-3 w-3 rounded-full" style={{ backgroundColor: 'var(--color-forest)' }} />
+                  <div className="h-3 w-3 rounded-full" style={{ backgroundColor: 'var(--color-gold)' }} />
+                </div>
               </div>
 
-              {/* receipt card */}
-              <div className="px-5 -mt-2 relative">
-                <div className="relative bg-white rounded-xl shadow-md p-4 font-mono text-[11px] leading-relaxed text-ink/70 overflow-hidden">
-                  <div className="absolute inset-x-0 top-0 h-0.5 bg-gold/60 animate-scanline" key={cycle} />
-                  <p className="text-ink font-semibold mb-2">TeleBirr Receipt</p>
-                  <p>TXN: CBW4L9X2K7</p>
-                  <p>Amount: ETB 640.00</p>
-                  <p>To: Selam Mini-Mart</p>
-                  <p>Date: 04 Jul 2026, 14:12</p>
-
-                  {/* stamp */}
-                  <div
-                    key={`stamp-${cycle}`}
-                    className="absolute -bottom-2 -right-3 rotate-[-8deg] animate-stamp"
-                  >
-                    <div className="border-[3px] border-birr text-birr rounded-lg px-3 py-1.5 font-sans font-extrabold text-sm tracking-wide bg-birr/5">
-                      VERIFIED
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                  <div className="bg-white/70 rounded-lg px-3 py-2">
-                    <p className="font-mono text-[9px] uppercase text-ink/40">Sender match</p>
-                    <p className="font-sans text-xs font-semibold text-birr">Confirmed</p>
-                  </div>
-                  <div className="bg-white/70 rounded-lg px-3 py-2">
-                    <p className="font-mono text-[9px] uppercase text-ink/40">Amount</p>
-                    <p className="font-sans text-xs font-semibold text-ink">ETB 640.00</p>
+              {/* App header */}
+              <div className="px-5 pb-4">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/images/app_icons/payverify_icon_192x192.png"
+                    alt="PayVerify"
+                    className="h-10 w-10 rounded-xl shadow-md"
+                  />
+                  <div>
+                    <p className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>PayVerify</p>
+                    <p className="text-[10px]" style={{ color: 'var(--color-text-muted)' }}>Cashier Terminal</p>
                   </div>
                 </div>
               </div>
 
-              {/* bottom nav */}
-              <div className="absolute bottom-0 inset-x-0 bg-white border-t border-ink/10 px-6 py-3 flex justify-between font-mono text-[9px] text-ink/40 uppercase">
-                <span className="text-birr">Verify</span>
-                <span>History</span>
-                <span>Settings</span>
+              {/* Verify card */}
+              <div className="mx-4 rounded-2xl p-4" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Verify Transaction</p>
+
+                {/* QR button */}
+                <div className="mb-3 flex items-center justify-center gap-2 rounded-xl py-3 text-white text-sm font-semibold" style={{ backgroundColor: 'var(--color-forest)' }}>
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                  </svg>
+                  Scan QR Code
+                </div>
+
+                {/* Receipt result */}
+                <div className="rounded-xl p-3" style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[10px] font-medium" style={{ color: 'var(--color-text-muted)' }}>TeleBirr</span>
+                    <span className="rounded-full px-2 py-0.5 text-[9px] font-bold text-white" style={{ backgroundColor: 'var(--color-forest)' }}>VERIFIED</span>
+                  </div>
+                  <p className="font-mono text-xs font-semibold" style={{ color: 'var(--color-text)' }}>TXN: CBW4L9X2K7</p>
+                  <p className="mt-1 text-lg font-bold" style={{ color: 'var(--color-gold)' }}>ETB 640.00</p>
+                  <div className="mt-2 flex gap-2">
+                    <span className="rounded-md px-2 py-0.5 text-[9px] font-medium" style={{ backgroundColor: 'rgba(39,107,71,0.15)', color: 'var(--color-forest)' }}>Sender Match</span>
+                    <span className="rounded-md px-2 py-0.5 text-[9px] font-medium" style={{ backgroundColor: 'rgba(232,184,46,0.15)', color: 'var(--color-gold)' }}>Amount OK</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Scanline animation */}
+              <div className="pointer-events-none absolute inset-x-4 top-0 overflow-hidden rounded-2xl">
+                <div className="animate-scanline h-0.5 w-full opacity-60" style={{ background: 'linear-gradient(90deg, transparent, var(--color-gold), transparent)' }} />
+              </div>
+
+              {/* Bottom nav */}
+              <div className="absolute bottom-0 left-0 right-0 flex items-center justify-around border-t px-4 py-3" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
+                {['Verify', 'History', 'Settings'].map((item, i) => (
+                  <div key={item} className="flex flex-col items-center gap-1">
+                    <div className={`h-5 w-5 rounded-full ${i === 0 ? '' : 'opacity-30'}`} style={{ backgroundColor: i === 0 ? 'var(--color-forest)' : 'var(--color-text-muted)' }} />
+                    <span className={`text-[9px] font-medium ${i === 0 ? '' : 'opacity-40'}`} style={{ color: i === 0 ? 'var(--color-forest)' : 'var(--color-text-muted)' }}>{item}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="absolute -bottom-6 -left-6 bg-white rounded-xl shadow-lg px-4 py-3 font-mono text-xs hidden sm:block">
-            <span className="text-ink/40">avg. check time</span>
-            <p className="text-ink font-semibold text-base">1.8 sec</p>
+        {/* Floating badge */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.2, duration: 0.5 }}
+          className="absolute -right-6 top-24 glass rounded-xl px-3 py-2 shadow-lg sm:block hidden"
+        >
+          <p className="text-[10px] font-medium" style={{ color: 'var(--color-text-muted)' }}>Avg. check time</p>
+          <p className="text-lg font-bold font-mono" style={{ color: 'var(--color-gold)' }}>0.8s</p>
+        </motion.div>
+      </motion.div>
+    </div>
+  )
+}
+
+export default function Hero() {
+  return (
+    <section className="relative min-h-[auto] sm:min-h-screen flex items-center overflow-hidden pt-24 pb-12 sm:pt-20 sm:pb-16 lg:pt-0 lg:pb-0">
+      {/* Background gradient */}
+      <div className="absolute inset-0" style={{
+        background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-secondary) 50%, var(--color-bg) 100%)'
+      }} />
+
+      {/* Decorative orbs */}
+      <div className="absolute top-20 right-10 h-72 w-72 rounded-full opacity-20 blur-[100px]" style={{ backgroundColor: 'var(--color-forest)' }} />
+      <div className="absolute bottom-20 left-10 h-56 w-56 rounded-full opacity-15 blur-[80px]" style={{ backgroundColor: 'var(--color-gold)' }} />
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Mobile-first: phone on top, text below. Desktop: side by side */}
+        <div className="flex flex-col-reverse items-center gap-10 lg:grid lg:grid-cols-2 lg:gap-16 lg:items-center">
+          {/* Left: Text */}
+          <div className="text-center lg:text-left">
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0}
+              className="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide"
+              style={{
+                backgroundColor: 'rgba(39,107,71,0.12)',
+                color: 'var(--color-forest)',
+                border: '1px solid rgba(39,107,71,0.2)',
+              }}
+            >
+              <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-forest)' }} />
+              Built for Ethiopian Merchants
+            </motion.div>
+
+            <motion.h1
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={1}
+              className="font-display text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl xl:text-6xl"
+              style={{ color: 'var(--color-text)' }}
+            >
+              End Payment Fraud{' '}
+              <span className="text-gradient">at the Counter</span>
+            </motion.h1>
+
+            <motion.p
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={2}
+              className="mt-5 max-w-lg text-base leading-relaxed sm:text-lg mx-auto lg:mx-0"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              Verify every TeleBirr, CBE, and bank transaction in under a second.
+              QR scan, receipt OCR, or manual check — fake screenshots never make it past your till.
+            </motion.p>
+
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={3}
+              className="mt-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start"
+            >
+              <a
+                href="#download"
+                className="group inline-flex items-center justify-center gap-2.5 rounded-2xl px-7 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] focus-ring"
+                style={{ backgroundColor: 'var(--color-forest)', boxShadow: '0 4px 24px rgba(39,107,71,0.35)' }}
+              >
+                <svg className="h-5 w-5 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                Download the App
+              </a>
+              <a
+                href="#gallery"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-3.5 text-base font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] focus-ring"
+                style={{
+                  color: 'var(--color-text)',
+                  backgroundColor: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                }}
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                </svg>
+                See Screenshots
+              </a>
+            </motion.div>
+
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={4}
+              className="mt-8 flex flex-wrap gap-3 justify-center lg:justify-start"
+            >
+              {[
+                { icon: '📱', text: 'Android 8.0+' },
+                { icon: '📡', text: 'Works Offline' },
+                { icon: '🌍', text: 'Amharic & English' },
+              ].map((chip) => (
+                <span
+                  key={chip.text}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
+                  style={{
+                    backgroundColor: 'var(--color-surface)',
+                    color: 'var(--color-text-secondary)',
+                    border: '1px solid var(--color-border)',
+                  }}
+                >
+                  <span>{chip.icon}</span>
+                  {chip.text}
+                </span>
+              ))}
+            </motion.div>
           </div>
+
+          {/* Right: Phone mockup */}
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.3 }}
+            className="flex justify-center lg:justify-end"
+          >
+            <PhoneMockup />
+          </motion.div>
         </div>
       </div>
     </section>

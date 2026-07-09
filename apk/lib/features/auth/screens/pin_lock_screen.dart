@@ -231,14 +231,15 @@ class _PinLockScreenState extends ConsumerState<PinLockScreen>
                     width: 72,
                     height: 72,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(18),
                       border: Border.all(color: AppTheme.gold, width: 2),
                     ),
                     padding: const EdgeInsets.all(4),
-                    child: ClipOval(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
                       child: Image.asset(
                         'assets/payverify_icons/payverify_icon_512x512.png',
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
