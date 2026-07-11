@@ -11,7 +11,7 @@ export default function App() {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <div className="min-h-screen bg-noise" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+    <div className="min-h-screen bg-noise pb-20 md:pb-0" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
       <Navbar theme={theme} toggleTheme={toggleTheme} />
       <main>
         <Hero />

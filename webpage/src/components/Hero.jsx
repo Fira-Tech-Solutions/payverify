@@ -116,7 +116,7 @@ function PhoneMockup() {
 
 export default function Hero() {
   return (
-    <section className="relative min-h-[auto] sm:min-h-screen flex items-center overflow-hidden pt-24 pb-12 sm:pt-20 sm:pb-16 lg:pt-0 lg:pb-0">
+    <section id="hero" className="relative min-h-[auto] sm:min-h-screen flex items-center overflow-x-hidden pt-20 pb-12 sm:pt-16 sm:pb-20 lg:pt-0 lg:pb-0">
       {/* Background gradient */}
       <div className="absolute inset-0" style={{
         background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-secondary) 50%, var(--color-bg) 100%)'
@@ -128,7 +128,7 @@ export default function Hero() {
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Mobile-first: phone on top, text below. Desktop: side by side */}
-        <div className="flex flex-col-reverse items-center gap-10 lg:grid lg:grid-cols-2 lg:gap-16 lg:items-center">
+        <div className="flex flex-col-reverse items-center gap-12 lg:grid lg:grid-cols-2 lg:gap-16 lg:items-center">
           {/* Left: Text */}
           <div className="text-center lg:text-left">
             <motion.div
@@ -136,14 +136,9 @@ export default function Hero() {
               initial="hidden"
               animate="visible"
               custom={0}
-              className="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide"
-              style={{
-                backgroundColor: 'rgba(39,107,71,0.12)',
-                color: 'var(--color-forest)',
-                border: '1px solid rgba(39,107,71,0.2)',
-              }}
+              className="mb-4 inline-flex items-center gap-2.5 rounded-full border border-[var(--color-forest)]/30 bg-[var(--color-forest)]/10 px-5 py-2.5 text-xs font-semibold tracking-wider backdrop-blur-md"
             >
-              <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-forest)' }} />
+              <span className="h-2 w-2 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-forest)' }} />
               Built for Ethiopian Merchants
             </motion.div>
 
@@ -152,11 +147,10 @@ export default function Hero() {
               initial="hidden"
               animate="visible"
               custom={1}
-              className="font-display text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl xl:text-6xl"
-              style={{ color: 'var(--color-text)' }}
+              className="font-display text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl"
             >
               End Payment Fraud{' '}
-              <span className="text-gradient">at the Counter</span>
+              <span className="text-[var(--color-forest)]">at the Counter</span>
             </motion.h1>
 
             <motion.p
@@ -164,8 +158,7 @@ export default function Hero() {
               initial="hidden"
               animate="visible"
               custom={2}
-              className="mt-5 max-w-lg text-base leading-relaxed sm:text-lg mx-auto lg:mx-0"
-              style={{ color: 'var(--color-text-secondary)' }}
+              className="mt-6 max-w-lg text-base leading-relaxed text-white/90 sm:text-lg mx-auto lg:mx-0"
             >
               Verify every TeleBirr, CBE, and bank transaction in under a second.
               QR scan, receipt OCR, or manual check — fake screenshots never make it past your till.
@@ -176,32 +169,27 @@ export default function Hero() {
               initial="hidden"
               animate="visible"
               custom={3}
-              className="mt-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start"
+              className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
               <a
                 href="#download"
-                className="group inline-flex items-center justify-center gap-2.5 rounded-2xl px-7 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] focus-ring"
-                style={{ backgroundColor: 'var(--color-forest)', boxShadow: '0 4px 24px rgba(39,107,71,0.35)' }}
+                className="group relative inline-flex items-center justify-center gap-2.5 rounded-xl border border-[var(--color-forest)]/30 bg-[var(--color-forest)] px-8 py-4 text-base font-semibold text-white backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:border-[var(--color-forest)]/50 active:scale-[0.98] focus-ring"
               >
-                <svg className="h-5 w-5 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
+                <svg className="relative h-5 w-5 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
                 </svg>
-                Download the App
+                <span className="relative">Download the App</span>
               </a>
               <a
                 href="#gallery"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-3.5 text-base font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] focus-ring"
-                style={{
-                  color: 'var(--color-text)',
-                  backgroundColor: 'var(--color-surface)',
-                  border: '1px solid var(--color-border)',
-                }}
+                className="group relative inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-8 py-4 text-base font-semibold text-white backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98] focus-ring"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
                 </svg>
-                See Screenshots
+                <span>See Screenshots</span>
               </a>
             </motion.div>
 
@@ -210,7 +198,7 @@ export default function Hero() {
               initial="hidden"
               animate="visible"
               custom={4}
-              className="mt-8 flex flex-wrap gap-3 justify-center lg:justify-start"
+              className="mt-10 flex flex-wrap gap-3 justify-center lg:justify-start"
             >
               {[
                 { icon: '📱', text: 'Android 8.0+' },
@@ -219,15 +207,10 @@ export default function Hero() {
               ].map((chip) => (
                 <span
                   key={chip.text}
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
-                  style={{
-                    backgroundColor: 'var(--color-surface)',
-                    color: 'var(--color-text-secondary)',
-                    border: '1px solid var(--color-border)',
-                  }}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-medium backdrop-blur-md transition-all hover:border-white/20 hover:bg-white/10"
                 >
-                  <span>{chip.icon}</span>
-                  {chip.text}
+                  <span className="text-lg">{chip.icon}</span>
+                  <span className="text-white/90">{chip.text}</span>
                 </span>
               ))}
             </motion.div>

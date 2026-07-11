@@ -76,7 +76,7 @@ export default function AppGallery() {
   }
 
   return (
-    <section id="gallery" className="relative py-20 sm:py-28">
+    <section id="gallery" className="relative py-20 sm:py-28 overflow-x-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -86,13 +86,13 @@ export default function AppGallery() {
           className="mb-12 flex items-end justify-between"
         >
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-forest)' }}>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-forest)]">
               App Preview
             </p>
-            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl" style={{ color: 'var(--color-text)' }}>
+            <h2 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
               See PayVerify in Action
             </h2>
-            <p className="mt-2 max-w-md text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-white/90">
               A clean, dark interface built for fast verification at the counter.
             </p>
           </div>

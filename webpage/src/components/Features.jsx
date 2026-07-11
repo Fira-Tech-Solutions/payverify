@@ -39,22 +39,22 @@ const item = {
 
 export default function Features() {
   return (
-    <section id="features" className="relative py-20 sm:py-28">
+    <section id="features" className="relative py-20 sm:py-28 overflow-x-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-forest)' }}>
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-forest)]">
             The Problem & Solution
           </p>
-          <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl lg:text-5xl" style={{ color: 'var(--color-text)' }}>
+          <h2 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
             Fake Screenshots Stop Here
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/90">
             Every verification goes directly to the bank or wallet API. No more guessing, no more fraud.
           </p>
         </motion.div>
@@ -65,28 +65,24 @@ export default function Features() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
-          className="grid gap-4 sm:grid-cols-3"
+          className="grid gap-6 sm:grid-cols-3"
         >
           {features.map((feature) => (
             <motion.div
               key={feature.id}
               variants={item}
-              className={`group relative rounded-2xl p-6 sm:p-8 transition-all hover:scale-[1.01] ${feature.span}`}
-              style={{
-                backgroundColor: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-              }}
+              className={`group relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-6 sm:p-8 transition-all duration-300 hover:scale-[1.02] hover:border-white/20 hover:bg-white/10 ${feature.span}`}
             >
               <div
-                className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl transition-transform group-hover:scale-110"
-                style={{ backgroundColor: `${feature.color}18`, color: feature.color }}
+                className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl border border-white/10 transition-all duration-300 group-hover:scale-110 group-hover:border-white/20"
+                style={{ backgroundColor: `${feature.color}15`, color: feature.color }}
               >
                 {iconMap[feature.icon]}
               </div>
-              <h3 className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
+              <h3 className="text-lg font-bold text-white">
                 {feature.title}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+              <p className="mt-2.5 text-sm leading-relaxed text-white/80">
                 {feature.description}
               </p>
             </motion.div>
@@ -98,21 +94,19 @@ export default function Features() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-16 rounded-2xl p-6 sm:p-8"
-          style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+          className="mt-20 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-8 sm:p-10"
         >
-          <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+          <p className="mb-8 text-center text-xs font-semibold uppercase tracking-wider text-white/60">
             Supported Payment Methods
           </p>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
             {paymentMethods.map((method) => (
               <motion.div
                 key={method.name}
                 whileHover={{ scale: 1.05 }}
-                className="flex flex-col items-center gap-2.5 rounded-xl px-3 py-4 transition-colors"
-                style={{ backgroundColor: 'var(--color-bg)' }}
+                className="group flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-5 transition-all duration-300 hover:border-white/20 hover:bg-white/10"
               >
-                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl" style={{ border: '1px solid var(--color-border)' }}>
+                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all group-hover:border-white/20">
                   <img
                     src={method.icon}
                     alt={method.name}
@@ -121,8 +115,8 @@ export default function Features() {
                   />
                 </div>
                 <div className="text-center">
-                  <p className="text-xs font-semibold" style={{ color: 'var(--color-text)' }}>{method.name}</p>
-                  <p className="text-[10px]" style={{ color: 'var(--color-text-muted)' }}>{method.type}</p>
+                  <p className="text-xs font-semibold text-white">{method.name}</p>
+                  <p className="text-[10px] text-white/60">{method.type}</p>
                 </div>
               </motion.div>
             ))}

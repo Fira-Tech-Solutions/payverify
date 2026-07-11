@@ -54,7 +54,7 @@ export default function DownloadSection() {
   const others = items.filter((o) => !o.primary)
 
   return (
-    <section id="download" className="relative py-20 sm:py-28">
+    <section id="download" className="relative py-20 sm:py-28 overflow-x-hidden">
       <div className="absolute inset-0" style={{
         background: 'linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-secondary) 50%, var(--color-bg) 100%)'
       }} />
@@ -65,31 +65,40 @@ export default function DownloadSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-10"
+          className="text-center mb-12"
         >
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-forest)' }}>
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-forest)]">
             Get the App
           </p>
-          <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl lg:text-5xl" style={{ color: 'var(--color-text)' }}>
+          <h2 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
             Download PayVerify
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/90">
             Available for Android and iOS. Pick your platform below.
           </p>
         </motion.div>
 
         {/* Platform tabs */}
-        <div className="mx-auto mb-10 flex max-w-xs rounded-2xl p-1" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+        <div className="mx-auto mb-12 flex max-w-xs rounded-2xl p-1.5" style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
           {['android', 'ios'].map((p) => (
             <button
               key={p}
               onClick={() => setPlatform(p)}
-              className={`flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all ${
-                platform === p ? 'text-white shadow-md' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+              className={`relative flex-1 rounded-xl py-3 text-sm font-semibold transition-all duration-300 active:scale-95 ${
+                platform === p
+                  ? 'text-white z-10'
+                  : 'text-white/70 hover:text-white'
               }`}
-              style={platform === p ? { backgroundColor: 'var(--color-forest)' } : {}}
+              style={platform === p
+                ? { backgroundColor: 'var(--color-forest)', boxShadow: '0 4px 20px rgba(39,107,71,0.3)' }
+                : {}
+              }
             >
-              {p === 'android' ? 'Android' : 'iPhone'}
+              <span className="relative z-10">{
+                platform === p && p === 'android' ? '🧬 Android' :
+                platform === p && p === 'ios' ? '🍎 iPhone' :
+                p === 'android' ? 'Android' : 'iPhone'
+              }</span>
             </button>
           ))}
         </div>

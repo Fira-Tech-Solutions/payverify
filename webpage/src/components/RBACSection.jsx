@@ -33,22 +33,22 @@ export default function RBACSection() {
   const other = activeView === 'owner' ? rbacScenarios.cashier : rbacScenarios.owner
 
   return (
-    <section id="rbac" className="relative py-20 sm:py-28">
+    <section id="rbac" className="relative py-20 sm:py-28 overflow-x-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-forest)' }}>
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-forest)]">
             Multi-Tenant Security
           </p>
-          <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl lg:text-5xl" style={{ color: 'var(--color-text)' }}>
+          <h2 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
             Built for Teams, Not Just Tills
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/90">
             Owners see everything. Cashiers see only what they need. Secure 24-hour invitation codes for onboarding — no shared passwords.
           </p>
         </motion.div>
@@ -58,61 +58,66 @@ export default function RBACSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mx-auto mb-12 flex w-fit rounded-2xl p-1"
-          style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+          className="mx-auto mb-16 flex w-fit rounded-2xl p-1.5"
+          style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}
         >
           {['owner', 'cashier'].map((view) => (
             <button
               key={view}
               onClick={() => setActiveView(view)}
-              className={`relative flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all focus-ring ${
-                activeView === view ? 'text-white' : ''
+              className={`group relative flex items-center gap-2.5 rounded-xl px-8 py-4 text-sm font-semibold transition-all duration-300 active:scale-95 focus-ring ${
+                activeView === view
+                  ? 'text-white z-10'
+                  : 'text-white/70 hover:text-white'
               }`}
-              style={activeView === view ? { backgroundColor: 'var(--color-forest)' } : { color: 'var(--color-text-secondary)' }}
+              style={activeView === view
+                ? { backgroundColor: 'var(--color-forest)', boxShadow: '0 4px 20px rgba(39,107,71,0.4)' }
+                : {}
+              }
             >
-              {view === 'owner' ? ownerIcon : cashierIcon}
-              <span className="capitalize">{view === 'owner' ? 'Owner View' : 'Cashier View'}</span>
+              <span className="relative z-10 flex items-center gap-2.5">
+                {view === 'owner' ? ownerIcon : cashierIcon}
+                <span className="capitalize">{view === 'owner' ? 'Owner View' : 'Cashier View'}</span>
+              </span>
             </button>
           ))}
         </motion.div>
 
         {/* Comparison display */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-8 lg:grid-cols-2">
           {/* Active view */}
           <motion.div
             key={activeView}
             initial={{ opacity: 0, x: activeView === 'owner' ? -20 : 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4 }}
-            className="rounded-2xl p-6 sm:p-8"
-            style={{
-              backgroundColor: 'var(--color-surface)',
-              border: '2px solid var(--color-forest)',
-              boxShadow: 'var(--shadow-glow)',
-            }}
+            className="relative rounded-2xl border-2 border-[var(--color-forest)] bg-white/5 backdrop-blur-md p-8"
+            style={{ boxShadow: '0 8px 40px rgba(39,107,71,0.2)' }}
           >
-            <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl text-white" style={{ backgroundColor: 'var(--color-forest)' }}>
+            {/* Accent glow */}
+            <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-[var(--color-forest)]/20 to-transparent opacity-50 blur-xl"></div>
+            
+            <div className="relative mb-8 flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl text-white shadow-lg" style={{ backgroundColor: 'var(--color-forest)' }}>
                 {activeView === 'owner' ? ownerIcon : cashierIcon}
               </div>
               <div>
-                <p className="text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>Current View</p>
-                <p className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>{current.label}</p>
+                <p className="text-xs font-medium text-white/60">Current View</p>
+                <p className="text-xl font-bold text-white">{current.label}</p>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {current.features.map((feature, i) => (
                 <motion.div
                   key={feature}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.08 }}
-                  className="flex items-start gap-3 rounded-xl px-4 py-3"
-                  style={{ backgroundColor: 'var(--color-bg)' }}
+                  className="group flex items-start gap-4 rounded-xl border border-white/10 bg-white/5 p-5 transition-all duration-300 hover:border-white/20 hover:bg-white/10 active:scale-[0.98]"
                 >
-                  <span style={{ color: 'var(--color-forest)' }}>{checkIcon}</span>
-                  <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{feature}</span>
+                  <span className="mt-0.5 flex-shrink-0 text-[var(--color-forest)]">{checkIcon}</span>
+                  <span className="text-sm font-medium text-white/90">{feature}</span>
                 </motion.div>
               ))}
             </div>
@@ -123,39 +128,34 @@ export default function RBACSection() {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="relative rounded-2xl p-6 sm:p-8 opacity-60"
-            style={{
-              backgroundColor: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-            }}
+            className="relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-8 opacity-70"
           >
             {/* Lock overlay */}
-            <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl" style={{ backgroundColor: 'rgba(var(--color-bg), 0.3)' }}>
-              <div className="flex flex-col items-center gap-2 rounded-xl px-4 py-3" style={{ backgroundColor: 'var(--color-surface-elevated)', border: '1px solid var(--color-border)' }}>
-                <span style={{ color: 'var(--color-text-muted)' }}>{lockIcon}</span>
-                <span className="text-xs font-semibold" style={{ color: 'var(--color-text-muted)' }}>Restricted</span>
+            <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/40 backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/10 px-6 py-5 backdrop-blur-md">
+                <span className="text-[var(--color-text-muted)]">{lockIcon}</span>
+                <span className="text-xs font-semibold tracking-wide text-white/60">Restricted Access</span>
               </div>
             </div>
 
-            <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)' }}>
+            <div className="relative mb-8 flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-[var(--color-text-muted)]">
                 {other.icon === 'owner' ? ownerIcon : cashierIcon}
               </div>
               <div>
-                <p className="text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>Not Visible</p>
-                <p className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>{other.label}</p>
+                <p className="text-xs font-medium text-white/60">Not Visible</p>
+                <p className="text-xl font-bold text-white/70">{other.label}</p>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {other.features.map((feature) => (
                 <div
                   key={feature}
-                  className="flex items-start gap-3 rounded-xl px-4 py-3"
-                  style={{ backgroundColor: 'var(--color-bg)' }}
+                  className="flex items-start gap-4 rounded-xl border border-white/5 bg-white/5 p-5"
                 >
-                  <span style={{ color: 'var(--color-text-muted)' }}>{lockIcon}</span>
-                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-muted)' }}>{feature}</span>
+                  <span className="mt-0.5 flex-shrink-0 text-white/40">{lockIcon}</span>
+                  <span className="text-sm font-medium text-white/50">{feature}</span>
                 </div>
               ))}
             </div>
@@ -167,21 +167,26 @@ export default function RBACSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 rounded-2xl p-6 sm:p-8 text-center"
-          style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+          className="relative mt-20 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-10 shadow-xl"
         >
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl" style={{ backgroundColor: 'rgba(232,184,46,0.12)', color: 'var(--color-gold)' }}>
-            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
-            </svg>
+          {/* Decorative elements */}
+          <div className="absolute -top-6 -right-6 h-32 w-32 rounded-full bg-[var(--color-gold)]/20 blur-3xl"></div>
+          <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-[var(--color-forest)]/20 blur-2xl"></div>
+          
+          <div className="relative flex flex-col items-center text-center">
+            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/10 shadow-lg" style={{ backgroundColor: 'rgba(232,184,46,0.15)', color: 'var(--color-gold)' }}>
+              <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-white">
+              Secure 24-Hour Invitation Codes
+            </h3>
+            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/80">
+              Owners generate time-limited codes to onboard new cashiers. No shared credentials, no permanent access.
+              Codes expire automatically and can be revoked instantly.
+            </p>
           </div>
-          <h3 className="text-xl font-bold" style={{ color: 'var(--color-text)' }}>
-            Secure 24-Hour Invitation Codes
-          </h3>
-          <p className="mx-auto mt-2 max-w-lg text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-            Owners generate time-limited codes to onboard new cashiers. No shared credentials, no permanent access.
-            Codes expire automatically and can be revoked instantly.
-          </p>
         </motion.div>
       </div>
     </section>

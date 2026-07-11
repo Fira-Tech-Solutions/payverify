@@ -99,28 +99,33 @@ export default function StatsBanner() {
   }, [])
 
   return (
-    <section id="stats" className="relative py-16 sm:py-20">
-      {/* Subtle top border glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-2/3" style={{
-        background: 'linear-gradient(90deg, transparent, var(--color-forest), transparent)'
-      }} />
+    <section id="stats" className="relative py-20 sm:py-28 overflow-x-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-2/3"
+        style={{
+          background: 'linear-gradient(90deg, transparent, var(--color-forest), transparent)'
+        }}
+      />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-forest)' }}>
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-forest)]">
             Live Platform Metrics
           </p>
-          <h2 className="mt-3 font-display text-2xl font-bold sm:text-3xl" style={{ color: 'var(--color-text)' }}>
+          <h2 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
             Trusted by Merchants Across Ethiopia
           </h2>
         </motion.div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-3">
           {stats.map((stat, i) => (
             <StatCard key={stat.label} stat={stat} index={i} />
           ))}
@@ -131,8 +136,7 @@ export default function StatsBanner() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.6 }}
-          className="mt-6 text-center text-xs"
-          style={{ color: 'var(--color-text-muted)' }}
+          className="mt-8 text-center text-sm text-white/60"
         >
           Data refreshes every 30 seconds from the live API
         </motion.p>
