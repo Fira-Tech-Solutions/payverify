@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:go_router/go_router.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import '../../../services/api/api_client.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/app_messages.dart';
@@ -27,7 +27,7 @@ class TeleBirrWebViewScreen extends StatefulWidget {
 }
 
 class _TeleBirrWebViewScreenState extends State<TeleBirrWebViewScreen> {
-  late final WebViewController _controller;
+  InAppWebViewController? _webViewController;
   bool _isLoading = true;
   bool _paymentDetected = false;
   Timer? _pollTimer;
@@ -37,54 +37,6 @@ class _TeleBirrWebViewScreenState extends State<TeleBirrWebViewScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (url) {
-            debugPrint('[TeleBirr WebView] Page started: $url');
-          },
-          onPageFinished: (url) async {
-            debugPrint('[TeleBirr WebView] Page finished: $url');
-            if (mounted) setState(() => _isLoading = false);
-            _checkUrlForPaymentStatus(url);
-          },
-          onNavigationRequest: (request) {
-            final url = request.url;
-            debugPrint('[TeleBirr WebView] Navigation: $url');
-
-            // Intercept deep link redirect
-            if (url.startsWith('payverify://')) {
-              _handleDeepLink(url);
-              return NavigationDecision.prevent;
-            }
-
-            // Detect payment success/failure via URL patterns
-            if (url.contains('trade_status=TRADE_SUCCESS') ||
-                url.contains('/paymentmall/pay/success')) {
-              if (!_paymentDetected) {
-                _paymentDetected = true;
-                _pollTimer?.cancel();
-                _onPaymentSuccess();
-              }
-              return NavigationDecision.prevent;
-            }
-
-            if (url.contains('trade_status=TRADE_FAIL') ||
-                url.contains('trade_status=TRADE_CLOSED') ||
-                url.contains('/paymentmall/pay/fail')) {
-              _pollTimer?.cancel();
-              _onPaymentFailed();
-              return NavigationDecision.prevent;
-            }
-
-            return NavigationDecision.navigate;
-          },
-        ),
-      )
-      ..setUserAgent('PayVerify/1.0 Ethiopia TeleBirrH5')
-      ..loadRequest(Uri.parse(widget.toPayUrl));
-
     _startOrderPolling();
   }
 
@@ -113,33 +65,6 @@ class _TeleBirrWebViewScreenState extends State<TeleBirrWebViewScreen> {
     });
   }
 
-  void _checkUrlForPaymentStatus(String url) {
-    if (_paymentDetected) return;
-
-    if (url.contains('trade_status=TRADE_SUCCESS') ||
-        url.contains('/paymentmall/pay/success')) {
-      _paymentDetected = true;
-      _pollTimer?.cancel();
-      _onPaymentSuccess();
-    } else if (url.contains('trade_status=TRADE_FAIL') ||
-        url.contains('trade_status=TRADE_CLOSED') ||
-        url.contains('/paymentmall/pay/fail')) {
-      _pollTimer?.cancel();
-      _onPaymentFailed();
-    }
-  }
-
-  void _handleDeepLink(String url) {
-    _pollTimer?.cancel();
-    final uri = Uri.parse(url);
-    final status = uri.queryParameters['status'];
-    if (status == 'TRADE_SUCCESS') {
-      _onPaymentSuccess();
-    } else {
-      _onPaymentFailed();
-    }
-  }
-
   void _onPaymentSuccess() {
     if (!mounted) return;
     context.go('/subscription/success', extra: {
@@ -164,9 +89,11 @@ class _TeleBirrWebViewScreenState extends State<TeleBirrWebViewScreen> {
     try {
       final result = await api.createTelebirrOrder(widget.tier, widget.periodMonths);
       if (!mounted) return;
-      final toPayUrl = result['toPayUrl'] as String?;
-      if (toPayUrl != null) {
-        _controller.loadRequest(Uri.parse(toPayUrl));
+      final url = result['toPayUrl'] as String?;
+      if (url != null) {
+        await _webViewController?.loadUrl(
+          urlRequest: URLRequest(url: WebUri(url)),
+        );
         setState(() {
           _isLoading = true;
           _paymentDetected = false;
@@ -225,7 +152,74 @@ class _TeleBirrWebViewScreenState extends State<TeleBirrWebViewScreen> {
                 )
               : null,
         ),
-        body: WebViewWidget(controller: _controller),
+        body: InAppWebView(
+          initialUrlRequest: URLRequest(
+            url: WebUri(widget.toPayUrl),
+          ),
+          initialSettings: InAppWebViewSettings(
+            javaScriptEnabled: true,
+            domStorageEnabled: true,
+            useShouldOverrideUrlLoading: true,
+            allowsInlineMediaPlayback: true,
+            mediaPlaybackRequiresUserGesture: false,
+            allowUniversalAccessFromFileURLs: true,
+            mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+            userAgent: 'PayVerify/1.0 Ethiopia TeleBirrH5',
+          ),
+          onWebViewCreated: (controller) {
+            _webViewController = controller;
+          },
+          onReceivedServerTrustAuthRequest: (controller, challenge) async {
+            return ServerTrustAuthResponse(
+              action: ServerTrustAuthResponseAction.PROCEED,
+            );
+          },
+          onLoadStart: (controller, url) {
+            debugPrint('[TeleBirr WebView] Page started: $url');
+          },
+          onLoadStop: (controller, url) async {
+            debugPrint('[TeleBirr WebView] Page finished: $url');
+            if (mounted) setState(() => _isLoading = false);
+
+            if (url != null && !_paymentDetected) {
+              final urlStr = url.toString();
+              if (urlStr.contains('trade_status=TRADE_SUCCESS') ||
+                  urlStr.contains('/paymentmall/pay/success')) {
+                _paymentDetected = true;
+                _pollTimer?.cancel();
+                _onPaymentSuccess();
+              } else if (urlStr.contains('trade_status=TRADE_FAIL') ||
+                  urlStr.contains('trade_status=TRADE_CLOSED') ||
+                  urlStr.contains('/paymentmall/pay/fail')) {
+                _pollTimer?.cancel();
+                _onPaymentFailed();
+              }
+            }
+          },
+          shouldOverrideUrlLoading: (controller, navigationAction) async {
+            final url = navigationAction.request.url?.toString() ?? '';
+            debugPrint('[TeleBirr WebView] Navigation: $url');
+
+            if (url.startsWith('payverify://')) {
+              final uri = Uri.parse(url);
+              final status = uri.queryParameters['status'];
+              if (status == 'TRADE_SUCCESS') {
+                _paymentDetected = true;
+                _pollTimer?.cancel();
+                _onPaymentSuccess();
+              } else {
+                _pollTimer?.cancel();
+                _onPaymentFailed();
+              }
+              return NavigationActionPolicy.CANCEL;
+            }
+
+            return NavigationActionPolicy.ALLOW;
+          },
+          onReceivedError: (controller, request, error) {
+            debugPrint('[TeleBirr WebView] Error: ${error.description}');
+          },
+        ),
       ),
     );
   }

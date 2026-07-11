@@ -169,8 +169,8 @@ class _VerifyScreenState extends ConsumerState<VerifyScreen>
               ),
             ),
             const SizedBox(height: 12),
-          ],
-        ),
+        ],
+      ),
       ),
     );
   }
@@ -315,32 +315,34 @@ class _VerifyScreenState extends ConsumerState<VerifyScreen>
 
     return Scaffold(
       backgroundColor: AppTheme.obsidian,
-      body: Stack(
-        children: [
-          // ── Gradient header background ─────────────────────────────
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 180,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [AppTheme.forestDark, AppTheme.obsidian],
-                  stops: [0.0, 0.4],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(transactionsProvider.notifier).sync();
+          if (!mounted) return;
+          await ref.read(subscriptionProvider.future);
+        },
+        color: AppTheme.gold,
+        backgroundColor: AppTheme.card,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Container(
+                height: 180,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [AppTheme.forestDark, AppTheme.obsidian],
+                    stops: [0.0, 0.4],
+                  ),
                 ),
               ),
             ),
-          ),
-
-          // ── Scrollable content ────────────────────────────────────
-          SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 48, 16, 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
                 // ── App Header ────────────────────────────────────
                 Row(
                   children: [
@@ -636,10 +638,11 @@ class _VerifyScreenState extends ConsumerState<VerifyScreen>
                     ),
                   ],
                 ),
-              ],
+              ]),
             ),
           ),
         ],
+      ),
       ),
     );
   }

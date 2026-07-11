@@ -38,6 +38,7 @@ router.post('/create-order', authenticate, requireOwner, async (req, res, next) 
     res.json({
       outTradeNo: result.outTradeNo,
       rawRequest: result.rawRequest,
+      toPayUrl: result.toPayUrl,
       amount,
       tier,
       periodMonths,
@@ -85,7 +86,7 @@ router.get('/order/:outTradeNo', authenticate, async (req, res, next) => {
       periodMonths: order.periodMonths,
       amount: Number(order.amount),
       status: order.status,
-      rawRequest: order.toPayUrl, // raw request is stored in toPayUrl field
+      toPayUrl: order.toPayUrl,
       paidAt: order.paidAt?.toISOString(),
       createdAt: order.createdAt.toISOString(),
     });

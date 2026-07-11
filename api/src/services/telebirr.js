@@ -205,7 +205,7 @@ async function requestAuthToken(fabricToken, appToken) {
     version: '1.0',
     biz_content: {
       access_token: appToken,
-      trade_type: 'InApp',
+      trade_type: 'Checkout',
       appid: merchantAppId,
       resource_type: 'OpenId',
     },
@@ -256,7 +256,7 @@ async function createTelebirrOrder({ businessId, tier, periodMonths, amount }) {
     version: '1.0',
     biz_content: {
       notify_url: notifyUrl,
-      trade_type: 'InApp',
+      trade_type: 'Checkout',
       appid: merchantAppId,
       merch_code: merchantCode,
       merch_order_id: merchOrderId,
@@ -294,10 +294,17 @@ async function createTelebirrOrder({ businessId, tier, periodMonths, amount }) {
   }
 
   const prepayId = result.biz_content.prepay_id;
+  const toPayUrl = result.biz_content.to_pay_url || null;
 
   // Build raw request string for the TeleBirr SuperApp
   const rawRequest = createRawRequest(prepayId);
   console.log('[TELEBIRR] Raw request:', rawRequest);
+  console.log('[TELEBIRR] To-pay URL:', toPayUrl);
+
+  // Construct H5 URL if TeleBirr didn't return one directly
+  const h5BaseUrl = process.env.TELEBIRR_BASE_URL;
+  const h5Url = toPayUrl || `${h5BaseUrl}/payment/h5?${rawRequest}`;
+  console.log('[TELEBIRR] H5 URL:', h5Url);
 
   // Save order to database
   const order = await prisma.subscriptionOrder.create({
@@ -308,13 +315,14 @@ async function createTelebirrOrder({ businessId, tier, periodMonths, amount }) {
       periodMonths,
       amount,
       status: 'PENDING',
-      toPayUrl: rawRequest, // Store raw request instead of URL
+      toPayUrl: h5Url,
     },
   });
 
   return {
     outTradeNo: merchOrderId,
     rawRequest,
+    toPayUrl: h5Url,
     prepayId,
     orderId: order.id,
   };
@@ -368,6 +376,11 @@ async function handleNotify(payload) {
   console.log('[TELEBIRR] Notify received:', JSON.stringify(payload));
 
   const { out_trade_no, trade_no, total_amount, trade_status, sign } = payload;
+
+  if (!out_trade_no) {
+    console.error('[TELEBIRR] Missing out_trade_no in notify payload');
+    return { return_code: 'FAIL', return_msg: 'Missing out_trade_no' };
+  }
 
   // Find order
   const order = await prisma.subscriptionOrder.findUnique({

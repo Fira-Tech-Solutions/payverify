@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../services/api/api_client.dart';
 import '../../../theme/app_theme.dart';
 
@@ -22,8 +21,6 @@ class PaymentScreen extends ConsumerStatefulWidget {
 class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   bool _loading = false;
   String? _error;
-  String? _rawRequest;
-  String? _outTradeNo;
 
   String get _tierName {
     switch (widget.tier) {
@@ -66,19 +63,20 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
           widget.tier, widget.periodMonths);
       if (!mounted) return;
 
-      final rawRequest = result['rawRequest'] as String?;
+      final toPayUrl = result['toPayUrl'] as String?;
       final outTradeNo = result['outTradeNo'] as String?;
 
-      if (rawRequest == null || outTradeNo == null) {
+      if (toPayUrl == null || outTradeNo == null) {
         throw Exception('Invalid response from server');
       }
 
-      setState(() {
-        _rawRequest = rawRequest;
-        _outTradeNo = outTradeNo;
+      context.push('/subscription/telebirr', extra: {
+        'toPayUrl': toPayUrl,
+        'outTradeNo': outTradeNo,
+        'tier': widget.tier,
+        'periodMonths': widget.periodMonths,
+        'amount': _amount,
       });
-
-      await _launchTeleBirr(rawRequest);
     } catch (e) {
       if (mounted) {
         final msg = e is ApiException ? e.message : 'Failed to create order. Please try again.';
@@ -86,19 +84,6 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       }
     } finally {
       if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _launchTeleBirr(String rawRequest) async {
-    final telebirrUrl = Uri.parse(
-        'telebirr://pay?rawRequest=${Uri.encodeComponent(rawRequest)}');
-
-    if (await canLaunchUrl(telebirrUrl)) {
-      await launchUrl(telebirrUrl,
-          mode: LaunchMode.externalApplication);
-    } else {
-      debugPrint(
-          '[Payment] TeleBirr app not installed, showing manual flow');
     }
   }
 
@@ -150,7 +135,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                     color: AppTheme.accent, size: 22),
                 SizedBox(width: 12),
                 Expanded(
-                  child: Text('Pay with TeleBirr SuperApp',
+                  child: Text('Pay with TeleBirr',
                       style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -175,107 +160,36 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                   Expanded(
                     child: Text(_error!,
                         style: const TextStyle(
-                            fontSize: 13,
-                            color: AppTheme.danger)),
+                            fontSize: 13, color: AppTheme.danger)),
                   ),
                 ],
               ),
             ),
           ],
           const SizedBox(height: 24),
-          if (_rawRequest == null)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _loading ? null : _createOrder,
-                icon: _loading
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Color(0xFF0A1A0A)))
-                    : const Icon(Icons.payment),
-                label: Text(_loading
-                    ? 'Creating order...'
-                    : 'Pay ETB ${_amount.toStringAsFixed(2)}'),
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16),
-                  disabledBackgroundColor:
-                      AppTheme.accent.withValues(alpha: 0.5),
-                ),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _loading ? null : _createOrder,
+              icon: _loading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Color(0xFF0A1A0A)))
+                  : const Icon(Icons.payment),
+              label: Text(_loading
+                  ? 'Creating order...'
+                  : 'Pay ETB ${_amount.toStringAsFixed(2)}'),
+              style: ElevatedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16),
+                disabledBackgroundColor:
+                    AppTheme.accent.withValues(alpha: 0.5),
               ),
             ),
-          if (_rawRequest != null) ...[
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppTheme.cardBg,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppTheme.border),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
-                    children: [
-                      Icon(Icons.info_outline,
-                          size: 18, color: AppTheme.accent),
-                      SizedBox(width: 8),
-                      Text('Complete payment in TeleBirr',
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.accent)),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Open your TeleBirr app and complete the payment. The order will be confirmed automatically.',
-                    style: TextStyle(
-                        fontSize: 13,
-                        color: AppTheme.textSecondary),
-                  ),
-                  const SizedBox(height: 12),
-                  if (_outTradeNo != null)
-                    Text('Order: $_outTradeNo',
-                        style: const TextStyle(
-                            fontSize: 11,
-                            fontFamily: 'monospace',
-                            color: AppTheme.textMuted)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _rawRequest != null
-                    ? () => _launchTeleBirr(_rawRequest!)
-                    : null,
-                icon: const Icon(Icons.open_in_new),
-                label: const Text('Open TeleBirr'),
-                style: OutlinedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 14),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => context.push('/subscription'),
-                icon: const Icon(Icons.check),
-                label: const Text('Check payment status'),
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 14),
-                ),
-              ),
-            ),
-          ],
+          ),
           const SizedBox(height: 16),
           const Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -312,16 +226,13 @@ class _SummaryRow extends StatelessWidget {
         children: [
           Text(label,
               style: const TextStyle(
-                  fontSize: 14,
-                  color: AppTheme.textSecondary)),
+                  fontSize: 14, color: AppTheme.textSecondary)),
           Text(value,
               style: TextStyle(
                 fontSize: isBold ? 18 : 14,
                 fontWeight:
                     isBold ? FontWeight.w800 : FontWeight.w600,
-                color: isBold
-                    ? AppTheme.textPrimary
-                    : AppTheme.textPrimary,
+                color: AppTheme.textPrimary,
               )),
         ],
       ),

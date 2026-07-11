@@ -24,9 +24,16 @@ class WorkersScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Workers')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(workersProvider);
+          ref.invalidate(inviteCodeProvider);
+        },
+        color: AppTheme.gold,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          children: [
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -101,6 +108,7 @@ class WorkersScreen extends ConsumerWidget {
                   ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -263,9 +271,9 @@ class _EmptyWorkers extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 12, color: AppTheme.textMuted)),
-          ],
-        ),
-      );
+        ],
+      ),
+    );
 }
 
 class _WorkersError extends StatelessWidget {

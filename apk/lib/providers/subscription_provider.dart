@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/subscription.dart';
 import '../services/api/api_client.dart';
+import '../providers/notifications_provider.dart';
 
 // ─── Subscription Status ─────────────────────────────────────────────────────
 final subscriptionProvider =
@@ -26,6 +27,15 @@ final subscriptionBannerProvider = Provider<SubscriptionBannerInfo?>((ref) {
   final sub = ref.watch(subscriptionProvider);
   return sub.whenOrNull(
     data: (status) {
+      // Trigger subscription expiry notifications via notificationsProvider
+      ref.read(notificationsProvider.notifier).checkSubscriptionAndNotify(
+        isTrial: status.isTrial,
+        isGrace: status.isGrace,
+        isExpired: status.isExpired,
+        daysRemaining: status.daysRemaining,
+        graceDaysRemaining: status.graceDaysRemaining,
+      );
+
       if (status.isTrial && (status.daysRemaining ?? 99) <= 3) {
         return SubscriptionBannerInfo(
           type: SubscriptionBannerType.trial,

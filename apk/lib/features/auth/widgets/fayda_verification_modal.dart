@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class FaydaVerificationResult {
   final String userId;
@@ -23,58 +23,9 @@ class FaydaVerificationModal extends StatefulWidget {
 }
 
 class _FaydaVerificationModalState extends State<FaydaVerificationModal> {
-  late final WebViewController _controller;
+  InAppWebViewController? _controller;
   bool _isLoading = true;
   bool _handled = false;
-
-  @override
-  void initState() {
-    super.initState();
-    final baseUrl = 'http://192.168.100.131:3000/v1';
-    final initUrl = '$baseUrl/auth/fayda-login-init?bizName=${Uri.encodeComponent(widget.bizName)}';
-
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (url) {
-            debugPrint('[Fayda WebView] Started: $url');
-          },
-          onPageFinished: (url) {
-            debugPrint('[Fayda WebView] Finished: $url');
-            if (mounted) setState(() => _isLoading = false);
-          },
-          onNavigationRequest: (request) {
-            final url = request.url;
-            debugPrint('[Fayda WebView] Navigation: $url');
-
-            // Intercept the fayda-success redirect
-            if (url.contains('/v1/auth/fayda-success') && !_handled) {
-              _handled = true;
-              final uri = Uri.parse(url);
-              final userId = uri.queryParameters['userId'];
-              final name = uri.queryParameters['name'];
-              final phone = uri.queryParameters['phone'];
-              if (userId != null && name != null && phone != null) {
-                Future.microtask(() {
-                  if (!mounted) return;
-                  Navigator.pop(
-                    context,
-                    FaydaVerificationResult(userId: userId, name: name, phone: phone),
-                  );
-                });
-              }
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
-          onWebResourceError: (error) {
-            debugPrint('[Fayda WebView] Error: ${error.description}');
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse(initUrl));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +43,53 @@ class _FaydaVerificationModalState extends State<FaydaVerificationModal> {
       ),
       body: Stack(
         children: [
-          WebViewWidget(controller: _controller),
+          InAppWebView(
+            initialUrlRequest: URLRequest(
+              url: WebUri(
+                'http://192.168.100.131:3000/v1/auth/fayda-login-init?bizName=${Uri.encodeComponent(widget.bizName)}',
+              ),
+            ),
+            initialSettings: InAppWebViewSettings(
+              javaScriptEnabled: true,
+              useShouldOverrideUrlLoading: true,
+            ),
+            onWebViewCreated: (controller) {
+              _controller = controller;
+            },
+            onLoadStart: (controller, url) {
+              debugPrint('[Fayda WebView] Started: $url');
+            },
+            onLoadStop: (controller, url) {
+              debugPrint('[Fayda WebView] Finished: $url');
+              if (mounted) setState(() => _isLoading = false);
+            },
+            shouldOverrideUrlLoading: (controller, navigationAction) async {
+              final url = navigationAction.request.url?.toString() ?? '';
+              debugPrint('[Fayda WebView] Navigation: $url');
+
+              if (url.contains('/v1/auth/fayda-success') && !_handled) {
+                _handled = true;
+                final uri = Uri.parse(url);
+                final userId = uri.queryParameters['userId'];
+                final name = uri.queryParameters['name'];
+                final phone = uri.queryParameters['phone'];
+                if (userId != null && name != null && phone != null) {
+                  Future.microtask(() {
+                    if (!mounted) return;
+                    Navigator.pop(
+                      context,
+                      FaydaVerificationResult(userId: userId, name: name, phone: phone),
+                    );
+                  });
+                }
+                return NavigationActionPolicy.CANCEL;
+              }
+              return NavigationActionPolicy.ALLOW;
+            },
+            onReceivedError: (controller, request, error) {
+              debugPrint('[Fayda WebView] Error: $error');
+            },
+          ),
           if (_isLoading)
             const Center(
               child: CircularProgressIndicator(color: Color(0xFF276B47)),

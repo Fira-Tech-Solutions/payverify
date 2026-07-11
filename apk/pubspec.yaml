@@ -45,10 +45,10 @@ dependencies:
   # Image picker for receipt photos
   image_picker: ^1.1.2
 
-  # TeleBirr H5 WebView
-  webview_flutter: ^4.10.0
+  # TeleBirr H5 in-app WebView
+  flutter_inappwebview: ^6.1.5
 
-  # Launch URLs / deep links (TeleBirr SuperApp)
+  # Launch URLs / deep links
   url_launcher: ^6.2.0
 
   # Celebration animation
@@ -57,6 +57,10 @@ dependencies:
   # App lock (PIN + Biometric)
   local_auth: ^2.3.0
   crypto: ^3.0.3
+
+  # Local push notifications
+  flutter_local_notifications: ^18.0.1
+  shared_preferences: ^2.2.2
 
   cupertino_icons: ^1.0.6
   flutter_native_splash: ^2.4.0

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/providers.dart';
 import '../providers/subscription_provider.dart';
+import '../providers/notifications_provider.dart';
 import '../theme/app_theme.dart';
 import '../services/realtime/realtime_service.dart';
 import '../services/sync/offline_sync_manager.dart';
@@ -75,6 +76,8 @@ class _AppShellState extends ConsumerState<AppShell> {
       const BottomNavigationBarItem(
           icon: Icon(Icons.settings), label: 'Settings'),
     ];
+
+    final unreadCount = ref.watch(notificationsProvider.select((n) => n.where((x) => !x.isRead).length));
 
     return Scaffold(
       backgroundColor: AppTheme.surface,
